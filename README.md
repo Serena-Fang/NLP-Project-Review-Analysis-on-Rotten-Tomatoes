@@ -167,7 +167,7 @@ We conducted t-tests to find whether the sentiment scores are significantly diff
 
 Results from sentiment analysis are consistent with our findings from word choices and topics for fresh vs. rotten reviews, which demonstrates that top critics’ reviews are significantly different from critics’ reviews. Therefore, we could conclude that the wording of fresh reviews is different from that of rotten reviews.
 
-**VI.Crosstab Analysis
+**VI.Crosstab Analysis**
 
 The following three charts are crosstab analysis combining critic/top critic with fresh/rotten categories.
 
