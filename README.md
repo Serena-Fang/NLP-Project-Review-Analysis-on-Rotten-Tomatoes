@@ -38,6 +38,8 @@ We did all of our analysis with Python. We wrote and shared our code via Jupyter
 2) **Topics/Focuses (Topic Modelling)**
 3) **Sentiments (Sentiment Analysis)**
 
+<img width="589" alt="Screenshot 2021-02-09 at 9 21 52 AM" src="https://user-images.githubusercontent.com/73702692/107302504-74246100-6ab8-11eb-9eb6-83ec04b0a237.png">
+
 Here we’ll show the methods we used for analyzing critics’ and top critics’ reviews as a demonstration of our approaches. Same methods were applied to fresh and rotten reviews.
 
 **Preprocessing**
@@ -49,7 +51,11 @@ First, we preprocessed our dataset by performing text normalization. We did this
 5) Removing special characters (so that our word lists only contains letters a-z and
 numbers 0-9)
 
-We added a column called “processed_review” to store processed textual data so that our data was ready for analysis. Then we selected only the “processed_review” column and the column indicating our groups of interest (in this case, top_critic). We also performed subsetting to further separate the selected dataset (rt_critic) into two datasets: one contained only reviews written by top critics (rt_top), and the other contained only those written by critics (rt_nottop). These datasets were helpful in later approaches of topic modeling and sentiment analysis.
+We added a column called “processed_review” to store processed textual data so that our data was ready for analysis. 
+
+<img width="618" alt="Screenshot 2021-02-09 at 9 22 11 AM" src="https://user-images.githubusercontent.com/73702692/107302508-75ee2480-6ab8-11eb-8e7c-7a9f01fd3269.png">
+
+Then we selected only the “processed_review” column and the column indicating our groups of interest (in this case, top_critic). We also performed subsetting to further separate the selected dataset (rt_critic) into two datasets: one contained only reviews written by top critics (rt_top), and the other contained only those written by critics (rt_nottop). These datasets were helpful in later approaches of topic modeling and sentiment analysis.
 
 **1) Word Choices (CountVectorizer + Logistic Regression)**
 We used both classification and frequent word to explore word choice differences between different categories (top critic vs. critic reviews, fresh vs. rotten reviews). We randomly selected 50,000 reviews (25,000 each) from the original dataset to balance our dataset used for classification and converted reviews written by top critics to 1’s and those written by critics to 0’s.
@@ -57,7 +63,13 @@ We used both classification and frequent word to explore word choice differences
 **Classification**
 After tokenization, we vectorized the text by setting up CountVectorizer from sklearn’s library and fitting it on our dataset to transform the text into a frequency count in the form of vectors. To be specific, we looked at all the unique words in our dataset and then counted how many times these words appeared in each of the pieces of texts, resulting in a vector representation of each piece of text.
 
+This process gave us a table (review-term matrix) with each unique word as a separate column and each review as a separate row with its index.
+
+<img width="625" alt="Screenshot 2021-02-09 at 9 22 30 AM" src="https://user-images.githubusercontent.com/73702692/107302513-77b7e800-6ab8-11eb-8ac4-785c3cca00f9.png">
+
 Then, we ran the classifier. We used train_test_split (function from the sklearn package) to divide our dataset into training set and testing set. Since our focus is to determine if it is plausible to differentiate comments using countVectorizer (instead of building the best model to classify them), there is no need to build a complicated system to estimate the exact accuracy of our model. In comparison, implementing train_test_split to evaluate our accuracy is time efficient. After splitting the training and testing dataset, we used a logistic regression model to classify critics’ reviews and top critics’ reviews.
+
+<img width="656" alt="Screenshot 2021-02-09 at 9 25 48 AM" src="https://user-images.githubusercontent.com/73702692/107302767-d9785200-6ab8-11eb-8738-398c6529be78.png">
 
 We also calculated featured weights for 5 words that had the highest coefficients (i.e., words that most likely indicated 1’s, in this case, top critics) and 5 words that had the lowest coefficients (i.e., words that most likely indicated 0’s, in this case, critics).
 
@@ -70,7 +82,13 @@ In order to perform topic analysis, we used Little MALLET Wrapper in Python. MAL
 **3) Sentiments (Sentiment Analysis)**
 The last part of our methods was to analyze sentiments. We performed sentiment analysis (vader’s SentimentIntensityAnalyzer) on processed review text within the top critic/critic dataset, and then put positive, negative, neutral and compound scores of each review into the dataframe. The compound score refers to the overall sentiment score of a review (1 means most extreme positive, -1 means most extreme negative). In the three subcategories of sentiment (positive, negative, and neutral), the score ranges from 0-1.
 
-Then we grouped the results by top critic (top_critic==True) and critic (top_critic==False) and printed their corresponding summaries of compound/negative/neutral/positive score. The example below is a summary of the compound score for reviews written by top critics and critics, which includes useful statistics such as number of records (count), average score (mean), standard deviation (std), minimum and maximum (min/max). Another method we implemented was independent samples t-test using ttest_ind from scipy stats, which compared the means of scores for two groups (in this case, top critics and critics). This function returns statistic, or t-statistic, and p-value.
+<img width="610" alt="Screenshot 2021-02-09 at 9 22 49 AM" src="https://user-images.githubusercontent.com/73702692/107302523-7981ab80-6ab8-11eb-944a-b5f240adab0e.png">
+
+Then we grouped the results by top critic (top_critic==True) and critic (top_critic==False) and printed their corresponding summaries of compound/negative/neutral/positive score. The example below is a summary of the compound score for reviews written by top critics and critics, which includes useful statistics such as number of records (count), average score (mean), standard deviation (std), minimum and maximum (min/max). 
+
+<img width="398" alt="Screenshot 2021-02-09 at 9 23 02 AM" src="https://user-images.githubusercontent.com/73702692/107302529-7b4b6f00-6ab8-11eb-9243-5242d6c55121.png">
+
+Another method we implemented was independent samples t-test using ttest_ind from scipy stats, which compared the means of scores for two groups (in this case, top critics and critics). This function returns statistic, or t-statistic, and p-value.
 
 **V. Results/Analysis**
 
@@ -94,6 +112,7 @@ We printed the top 20 most frequent words in both fresh and rotten reviews as pr
 <img width="637" alt="Screenshot 2021-02-09 at 9 01 04 AM" src="https://user-images.githubusercontent.com/73702692/107301485-8ef5d600-6ab6-11eb-98ad-5f4cc61e13b9.png">
 
 We can see that their words distributions are roughly similar, and they are also similar to top words from top critic/critic reviews. This means that overall, words like “film”, “movie”, “like”, “one”, “much” are frequently used in reviews. Maybe in the future, these words could also be counted as stopwords for more effective analysis. Below are some interesting finds regarding the most frequent words from fresh vs. rotten reviews:
+
 ● For the word “like”, its frequency in fresh reviews is around 1,500 while its frequency in rotten reviews is more than 2,000. Maybe people are more likely to use other positive words to describe a satisfactory movie in fresh reviews and more likely to use “don’t like” to describe an unsatisfactory one in rotten reviews, which causes “like” to be more frequent in rotten reviews. Another interpretation is that rotten reviews may use more “like” as a preposition or modal particle instead of using “like” as a word representing their preferences.
 
 ● “Best”, “great” and “fun” appear as the 6th, 11th and 13th most frequent words in fresh reviews, but they don’t appear in the top 20 words of rotten reviews. Similarly, “bad”, “never” appear in rotten reviews top words, but don’t appear in the fresh ones. These are understandable because fresh reviews tend to be more positive, while rotten reviews tend to be more negative.
@@ -113,6 +132,7 @@ the frequent words are significant. For the top 20 most frequent words, we can s
 <img width="666" alt="Screenshot 2021-02-09 at 9 01 22 AM" src="https://user-images.githubusercontent.com/73702692/107301491-90bf9980-6ab6-11eb-936d-c3bebdc07119.png">
 
 From the results of topic modeling, we see that the differences between fresh vs. rotten reviews are more observable than those between top critics’ and critics’ reviews. The topics are still rather vague, so we didn’t label each topic. Below are several findings:
+
 ● Both Topic 3 in fresh reviews and Topic 1 from rotten reviews contain words “comedy”, “fun” and “romantic”. However, in the topic, fresh reviews contain more positive adjectives like “entertaining”, “fun”, “humor”, “thriller”, “enjoyable”, “romantic” and “smart”. Rotten reviews contain more genre vocabularies like “hollywood”, “horror”, “humor”.
 
 ● Fresh reviews contain a rather humanitarian topic (Topic 2), which contains elements like “love”, “world”, “family”, “war”, “man”, “human”, “tale”. Although Topic 4 from rotten reviews also deals with topics like “love”, “work” and “material”, the specific humanitarian elements are not so much as in fresh reviews. From this we can interpret that when critics are satisfied about a movie, they’re more likely to pay attention to those humanitarian details.
@@ -132,6 +152,7 @@ Also, results from the topic modeling should be combined with more qualitative r
 <img width="639" alt="Screenshot 2021-02-09 at 9 01 37 AM" src="https://user-images.githubusercontent.com/73702692/107301504-9321f380-6ab6-11eb-96e4-95780b178411.png">
 
 From the summary of sentiment scores and the visualized box plots, we can see that the sentiments for fresh and rotten reviews are different. Our findings are shown below:
+
 ● The mean of compound scores of fresh reviews is around 0.45 while that of rotten reviews is around 0.0. It is understandable that fresh reviews bear more positive sentiments than rotten reviews. However, the compound score of rotten reviews is mostly neutral, but slightly positive according to the boxplot distribution. It is counterintuitive since we expect the rotten reviews should have a negative compound score in sentiment.
 
 ● Neutral sentiment has the highest mean scores among all types of scores in both fresh and rotten reviews.
@@ -145,6 +166,22 @@ From the summary of sentiment scores and the visualized box plots, we can see th
 We conducted t-tests to find whether the sentiment scores are significantly different for fresh and rotten reviews. The results show that all 4 t-statistics are very large in absolute values and the corresponding p-values are very small. It indicates that sentiments of fresh reviews are very different from rotten reviews.
 
 Results from sentiment analysis are consistent with our findings from word choices and topics for fresh vs. rotten reviews, which demonstrates that top critics’ reviews are significantly different from critics’ reviews. Therefore, we could conclude that the wording of fresh reviews is different from that of rotten reviews.
+
+**VI.Crosstab Analysis
+
+The following three charts are crosstab analysis combining critic/top critic with fresh/rotten categories.
+
+<img width="662" alt="Screenshot 2021-02-09 at 9 18 29 AM" src="https://user-images.githubusercontent.com/73702692/107302206-f52f2880-6ab7-11eb-95b0-2ccab9d5704a.png">
+
+From the frequency table, we can see that the number of critics is about three times that of top critics. Moreover, for critics, the proportion of fresh to rotten reviews is about 1.91 while for top critics, the proportion is around 1.46. The results indicate that both critics and top critics write fresh reviews. However, top critics are more likely to throw rotten tomatoes, indicating they’re more critical of films.
+
+<img width="663" alt="Screenshot 2021-02-09 at 9 18 37 AM" src="https://user-images.githubusercontent.com/73702692/107302213-f6f8ec00-6ab7-11eb-9297-cafb79338bf2.png">
+
+From the table showing average word counts, we can see that the mean of movie review length is about 21 words. Fresh reviews are slightly longer than rotten reviews. Top critics tend to write slightly longer reviews than critics.
+
+<img width="656" alt="Screenshot 2021-02-09 at 9 18 43 AM" src="https://user-images.githubusercontent.com/73702692/107302214-f82a1900-6ab7-11eb-8e63-03944728c6b2.png">
+
+From the table showing average sentiment scores, we can see that differences are not significant when we compare numbers horizontally between reviews written by critics and top critics. For example, compound scores are 0.33 and 0.31 for fresh reviews from critics and top critics respectively; and compound scores are 0.06 and 0.07 for rotten reviews from critics and top critics respectively. However, differences are bigger if we compare numbers vertically between fresh and rotten reviews. For example, compound scores are 0.33 and 0.06 for fresh and rotten reviews by critics respectively; and compound scores are 0.31 and 0.07 for fresh and rotten reviews by top critics respectively. These findings are consistent with our previous sections such that differences are more apparent in fresh and rotten reviews than in top critics’ and critics’ reviews.
 
 **VI. Conclusion** 
 
